@@ -54,7 +54,6 @@ getCountryData("usa");
 const renderCountry = function (data, className = "") {
   const [currencyKey] = Object.keys(data.currencies);
   const [languageKey] = Object.keys(data.languages);
-  console.log(languageKey);
 
   const html = ` 
     <article class="country ${className}">
@@ -77,7 +76,7 @@ const renderCountry = function (data, className = "") {
 };
 
 //* AJAX call for country 1
-
+/* 
 const getCountryAndNeighbour = function (country) {
   const request = new XMLHttpRequest();
   request.open("GET", `https://restcountries.com/v3.1/name/${country}`);
@@ -109,9 +108,47 @@ const getCountryAndNeighbour = function (country) {
   });
 };
 
-getCountryAndNeighbour("india");
+getCountryAndNeighbour("india"); */
 // getCountryAndNeighbour("usa");
 
 // Domain name is validated by the DNS with the original IP address
 
 //? Call back hell is defined as when there's a lot of nested call back's in order to execute an asynchronous task in sequence - it makes our code hard to maintain & difficult to understand
+
+//*Life cycle of promise
+
+/*
+! Promise
+ const getCountryData = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then((response) =>
+
+      ! json() method is available in all the responses of the fetch method (result value) & it also returns a promise
+      response.json()
+    )
+    .then((data) => renderCountry(data[0]));
+};
+ */
+
+//! Chaining Promise
+
+//* then() always returns promise no matter if we actually return anything or not, but if we do return a value than that value will become the fulfillment value of the return promise
+
+const getCountryData = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then((response) => response.json())
+    .then((data) => {
+      renderCountry(data[0]);
+
+      const [neighbour] = data[0].borders;
+
+      if (!neighbour) return;
+
+      fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`)
+        .then((result) => result.json())
+        .then((data) => {
+          renderCountry(data[0], "neighbour");
+        });
+    });
+};
+getCountryData("india");
