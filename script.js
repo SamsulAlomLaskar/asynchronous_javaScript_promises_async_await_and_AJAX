@@ -249,3 +249,54 @@ Promise.resolve("Resolved promise 2").then((res) => {
   console.log(res);
 }); // 4
 console.log("test end"); //2
+
+//* Promise using new Promise constuctor (takes only one argument & that is the executer function & the function takes two arguments resolve & reject)
+
+const lottery = new Promise(function (resolve, reject) {
+  // this function will contain the async behaviour that we are trying to handle with the promise
+
+  console.log("Lottery draw is happening");
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      resolve("You WON");
+    } else {
+      reject(new Error("You Loose"));
+    }
+  }, 2000);
+});
+
+lottery
+  .then((result) => console.log(result))
+  .catch((err) => console.error(err));
+
+//* Promsifying setTimeout
+const wait = function (secs) {
+  return new Promise((resolve, _) => {
+    setTimeout(resolve, secs * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log("I waited for 2 sec");
+    return wait(1);
+  })
+  .then(() => console.log("I waited for 1 sec"));
+
+wait(1)
+  .then(() => {
+    console.log("1 second passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("2 second passed");
+    return wait(1);
+  })
+  .then(() => {
+    console.log("3 second passed");
+    return wait(1);
+  })
+  .then(() => console.log("4 second passed"));
+
+Promise.resolve("Samsul").then((aa) => console.log(aa));
+Promise.reject(new Error("Alom")).catch((aa) => console.error(aa));
