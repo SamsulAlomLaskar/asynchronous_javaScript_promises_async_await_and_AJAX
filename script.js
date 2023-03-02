@@ -72,7 +72,12 @@ const renderCountry = function (data, className = "") {
         </article>
         `;
   countriesContainer.insertAdjacentHTML("beforeend", html);
-  countriesContainer.style.opacity = 1;
+  //   countriesContainer.style.opacity = 1;
+};
+
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText("beforeend", msg);
+  //
 };
 
 //* AJAX call for country 1
@@ -135,6 +140,8 @@ getCountryAndNeighbour("india"); */
 //* then() always returns promise no matter if we actually return anything or not, but if we do return a value than that value will become the fulfillment value of the return promise
 
 const getCountryData = function (country) {
+  //? handling promise rejections
+
   fetch(`https://restcountries.com/v3.1/name/${country}`)
     .then((response) => response.json())
     .then((data) => {
@@ -149,6 +156,17 @@ const getCountryData = function (country) {
         .then((data) => {
           renderCountry(data[0], "neighbour");
         });
+    })
+    .catch((err) => {
+      renderError(`Something went wrong ${err.message}. Try again`);
+      console.error(err);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+      console.log("finally");
     });
 };
-getCountryData("india");
+
+btn.addEventListener("click", function () {
+  getCountryData("india");
+});
