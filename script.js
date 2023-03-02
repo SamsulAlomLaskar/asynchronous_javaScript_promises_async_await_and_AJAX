@@ -139,11 +139,72 @@ getCountryAndNeighbour("india"); */
 
 //* then() always returns promise no matter if we actually return anything or not, but if we do return a value than that value will become the fulfillment value of the return promise
 
+const getJSON = function (url, errorMsg = "Something went wrong") {
+  console.log(url);
+  return fetch(url).then((response) => {
+    // console.log(url);
+    // console.log(response);
+    // console.log(response.status);
+    // console.log(response.json());
+    console.log(response.ok);
+    //! Error handling
+
+    if (!response.ok) {
+      console.log("1");
+      throw new Error(`${errorMsg} (${response.status})`);
+    }
+
+    return response.json();
+  });
+};
+
+const getCountryData = function (country) {
+  //? handling promise rejections
+
+  return getJSON(
+    `https://restcountries.com/v3.1/name/${country}`,
+    "country not found"
+  )
+    .then((data) => {
+      renderCountry(data[0]);
+
+      const [neighbour] = data[0].borders;
+
+      if (!neighbour) throw new Error("No neighbour found");
+
+      //! neighbour
+
+      return getJSON(
+        `https://restcountries.com/v3.1/alpha/${neighbour}`,
+        "country not found"
+      ).then((data) => {
+        renderCountry(data[0], "neighbour");
+      });
+    })
+    .catch((err) => {
+      renderError(`Something went wrong ${err.message}. Try again`);
+      console.error(err);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+/* 
 const getCountryData = function (country) {
   //? handling promise rejections
 
   fetch(`https://restcountries.com/v3.1/name/${country}`)
-    .then((response) => response.json())
+    .then((response) => {
+      console.log(response);
+      console.log(response.status);
+      //! Error handling
+
+      if (!response.ok)
+        throw new Error(`Country not found (${response.status})`);
+
+      return response.json();
+    })
     .then((data) => {
       renderCountry(data[0]);
 
@@ -166,7 +227,9 @@ const getCountryData = function (country) {
       console.log("finally");
     });
 };
+ */
 
 btn.addEventListener("click", function () {
   getCountryData("india");
 });
+// getCountryData(" ");
