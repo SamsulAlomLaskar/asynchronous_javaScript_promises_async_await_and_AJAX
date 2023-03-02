@@ -233,3 +233,19 @@ btn.addEventListener("click", function () {
   getCountryData("india");
 });
 // getCountryData(" ");
+
+//? Asynchronour eventss Event loop , callback queue in case of promise
+//* callback of promises doesn't go to callback queue,  once the fetch is done in the WEB APIs then the task moves to microtask queue ( it has the priority over the callback queue), the event loop will check if there's any task pending in MICROTASKS QUEUE, if available then it executes all the task before the callback queue's tasks
+
+//! Event Loop
+
+console.log("Test start"); // 1
+setTimeout(() => console.log("0 sec later"), 0); // 5
+Promise.resolve("Resolved promise 1").then((res) => console.log(res)); // 3
+Promise.resolve("Resolved promise 2").then((res) => {
+  for (let i = 0; i < 1000; i++) {
+    // console.log(i + 1);
+  }
+  console.log(res);
+}); // 4
+console.log("test end"); //2
