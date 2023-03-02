@@ -72,7 +72,7 @@ const renderCountry = function (data, className = "") {
         </article>
         `;
   countriesContainer.insertAdjacentHTML("beforeend", html);
-  //   countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 const renderError = function (msg) {
@@ -229,9 +229,9 @@ const getCountryData = function (country) {
 };
  */
 
-btn.addEventListener("click", function () {
-  getCountryData("india");
-});
+// btn.addEventListener("click", function () {
+//   getCountryData("india");
+// });
 // getCountryData(" ");
 
 //? Asynchronour eventss Event loop , callback queue in case of promise
@@ -300,3 +300,51 @@ wait(1)
 
 Promise.resolve("Samsul").then((aa) => console.log(aa));
 Promise.reject(new Error("Alom")).catch((aa) => console.error(aa));
+
+const getPosition = function () {
+  return new Promise((resolve, reject) => {
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => resolve(position),
+    //   (err) => reject(err)
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+getPosition()
+  .then((res) => console.log(res))
+  .catch((err) => console.log(rej));
+
+console.log("getting the geo location");
+
+const whereAmI = function () {
+  getPosition()
+    .then((pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+
+      return fetch(
+        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=72782002113893264204x116995`
+      );
+    })
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`Error with the geo coding ${response.status}`);
+
+      return response.json();
+    })
+    .then((data) => {
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      return fetch(`https://restcountries.com/v3.1/name/${data.country}`);
+    })
+    .then((res) => {
+      if (!res.ok) throw new Error(`Country not found ${res.status}`);
+      return res.json();
+    })
+    .then((data) => renderCountry(data[0]))
+    .catch((err) => {
+      console.error(err.message);
+    });
+};
+
+btn.addEventListener("click", whereAmI);
