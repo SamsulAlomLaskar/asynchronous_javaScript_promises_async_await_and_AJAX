@@ -132,3 +132,55 @@ const getThreeCountries = async function (c1, c2, c3) {
 };
 
 getThreeCountries("india", "canada", "tanzania");
+
+//? Promise.race() - the first settled promise is returned
+
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.com/v3.1/name/uae`),
+    getJSON(`https://restcountries.com/v3.1/name/india`),
+    getJSON(`https://restcountries.com/v3.1/name/turkey`),
+  ]);
+  console.log("Promise race", res[0]);
+})();
+
+const timeOut = function (s) {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error("Request took too long"));
+    }, s * 1000);
+  });
+};
+
+Promise.race([
+  getJSON(`https://restcountries.com/v3.1/name/turkey`),
+  timeOut(0.3),
+])
+  .then((res) => console.log(res[0]))
+  .catch((err) => console.error(err.message));
+
+//! promise.allsettled - it is similar to Promise.all but Promise.all shortcircuit as soon as one promise reject while Promise.allsettled never shortcicuit, it returns all the results of all the promises
+
+Promise.allSettled([
+  Promise.resolve("Success"),
+  Promise.reject("Reject"),
+  Promise.resolve("Another Success"),
+]).then((res) => console.log(res));
+
+Promise.all([
+  Promise.resolve("Success"),
+  Promise.reject("Rejected"),
+  Promise.resolve("Another Success"),
+])
+  .then((res) => console.log(res))
+  .catch((err) => console.error(err));
+
+//* Promise.any [ES2021] - returns the first fulfilled promise & it ignores the rejected promise
+
+Promise.any([
+  Promise.reject("Rejected ANY"),
+  Promise.resolve("Success ANY"),
+  Promise.resolve("Another Success ANY"),
+])
+  .then((res) => console.log(res))
+  .catch((err) => console.error(err));
